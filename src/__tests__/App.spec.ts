@@ -192,7 +192,6 @@ describe('App', () => {
       price: 500,
       quantity: 50,
     });
-
     const response = await request(app)
       .post('/orders')
       .send({
@@ -200,7 +199,7 @@ describe('App', () => {
         products: [
           {
             id: product.body.id,
-            quantity: 500,
+            quantity: 90,
           },
         ],
       });

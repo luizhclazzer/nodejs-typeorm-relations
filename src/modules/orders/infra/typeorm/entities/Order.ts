@@ -1,6 +1,5 @@
 import {
   Entity,
-  Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
@@ -16,9 +15,6 @@ import OrdersProducts from '@modules/orders/infra/typeorm/entities/OrdersProduct
 class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column()
-  customer_id: string;
 
   @ManyToOne(() => Customer, { eager: true })
   @JoinColumn({ name: 'customer_id' })

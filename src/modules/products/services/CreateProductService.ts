@@ -1,5 +1,3 @@
-import { inject, injectable } from 'tsyringe';
-
 import AppError from '@shared/errors/AppError';
 
 import Product from '../infra/typeorm/entities/Product';
@@ -11,12 +9,23 @@ interface IRequest {
   quantity: number;
 }
 
-@injectable()
 class CreateProductService {
   constructor(private productsRepository: IProductsRepository) {}
 
   public async execute({ name, price, quantity }: IRequest): Promise<Product> {
-    // TODO
+    const findProductWithName = await this.productsRepository.findByName(name);
+
+    if (findProductWithName) {
+      throw new AppError('This name is already used by another product');
+    }
+
+    const product = await this.productsRepository.create({
+      name,
+      price,
+      quantity,
+    });
+
+    return product;
   }
 }
 

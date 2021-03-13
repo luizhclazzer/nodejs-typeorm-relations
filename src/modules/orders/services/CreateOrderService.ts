@@ -1,5 +1,3 @@
-import { inject, injectable } from 'tsyringe';
-
 import AppError from '@shared/errors/AppError';
 
 import IProductsRepository from '@modules/products/repositories/IProductsRepository';
@@ -17,7 +15,6 @@ interface IRequest {
   products: IProduct[];
 }
 
-@injectable()
 class CreateOrderService {
   constructor(
     private ordersRepository: IOrdersRepository,
@@ -26,7 +23,42 @@ class CreateOrderService {
   ) {}
 
   public async execute({ customer_id, products }: IRequest): Promise<Order> {
-    // TODO
+    const customer = await this.customersRepository.findById(customer_id);
+
+    if (!customer) {
+      throw new AppError('Customer not found.');
+    }
+
+    const productsId = products.map(product => {
+      return { id: product.id };
+    });
+
+    const productsFound = await this.productsRepository.findAllById(productsId);
+
+    const orderProducts = productsFound.map(orderProduct => {
+      const finalProduct = products.find(
+        productFind => productFind.id === orderProduct.id,
+      );
+
+      return {
+        product_id: orderProduct.id,
+        price: orderProduct.price,
+        quantity: finalProduct?.quantity || 0,
+      };
+    });
+
+    if (products.length > orderProducts.length) {
+      throw new AppError('Product not found');
+    }
+
+    await this.productsRepository.updateQuantity(products);
+
+    const order = await this.ordersRepository.create({
+      customer,
+      products: orderProducts,
+    });
+
+    return order;
   }
 }
 
