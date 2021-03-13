@@ -199,7 +199,7 @@ describe('App', () => {
         products: [
           {
             id: product.body.id,
-            quantity: 90,
+            quantity: 500,
           },
         ],
       });
